@@ -1,44 +1,10 @@
 use std::io;
 
-enum Category {
-    Science,
-    Fiction,
-    Fantasy,
-    Adventure
-}
+mod book;
+mod user;
 
-impl Category {
-    fn as_string(&self) -> &'static str {
-        match self {
-            Self::Adventure => "Adventure",
-            Self::Fantasy => "Fantasy",
-            Self::Fiction => "Fiction",
-            Self::Science => "Science",
-        }
-    }
-}
-
-struct Book {
-    title: String,
-    author: String,
-    category: Category,
-    owner: String,
-}
-
-impl Book {
-    fn new(title: String, author: String, category: Category) -> Self {
-        Book {
-            title,
-            author,
-            category,
-            owner: String::from("None"),
-        }
-    }
-}
-
-struct User {
-    name: String,
-}
+use book::{Category, Book};
+use user::User;
 
 struct Library {
     books: [Book; 5],
@@ -84,22 +50,18 @@ impl Library {
             Err(_) => {println!("Error reading input"); return;}
         }
 
-        let title = title.trim();
-
-        for book in self.books.iter_mut() {
-            if book.title == title {
-                if book.owner == "None" {
+        match Book::find_book_i_by_title(&self.books, title.trim()) {
+            Some(index) => {
+                if self.books[index].owner == "None" {
                     println!("You borrowed {title} succesfully!\n");
-                    book.owner = self.users[self.current_user].name.clone();
+                    self.books[index].owner = self.users[self.current_user].name.clone();
                 } else {
-                    println!("This book is currenty borrowed by {}\n", book.owner);
+                    println!("This book is currenty borrowed by {}\n", self.books[index].owner);
                 }
-
-                return;
             }
-        }
 
-        println!("There's no book titled {title}\n");
+            None => println!("There's no book titled {title}\n"),
+        }
     }
 
     fn return_book(&mut self) {
@@ -110,22 +72,18 @@ impl Library {
             Err(_) => {println!("Error reading input"); return;}
         }
 
-        let title = title.trim();
-
-        for book in self.books.iter_mut() {
-            if book.title == title {
-                if book.owner == self.users[self.current_user].name {
-                    println!("You returned {title} succesfully!\n");
-                    book.owner = String::from("None");
+        match Book::find_book_i_by_title(&self.books, title.trim()) {
+            Some(index) => {
+                if self.books[index].owner == self.users[self.current_user].name {
+                    println!("You borrowed {title} succesfully!\n");
+                    self.books[index].owner = String::from("None");
                 } else {
                     println!("You don't posess this book\n");
                 }
-
-                return;
             }
-        }
 
-        println!("There's no book titled {title}\n");
+            None => println!("There's no book titled {title}\n"),
+        }
     }
 
     fn update_longest_owner(&mut self) {
@@ -138,10 +96,7 @@ impl Library {
         print!("\n");
 
         for book in self.books.iter() {
-            print!("{:width$} | ", book.title, width = self.longest_title);
-            print!("{:width$} | ", book.author, width = self.longest_author);
-            print!("{:width$} | ", book.category.as_string(), width = self.longest_category);
-            println!("{:width$}", book.owner, width = self.longest_owner);
+            book.display_book(self.longest_title, self.longest_author, self.longest_category, self.longest_owner);
         }
 
         print!("\n");
