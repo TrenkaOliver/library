@@ -2,16 +2,29 @@ pub enum Category {
     Science,
     Fiction,
     Fantasy,
-    Adventure
+    Adventure,
+    Drama
 }
 
 impl Category {
+    pub fn from_string(category: &str) -> Result<Self, String> {
+        match category.to_lowercase().as_str() {
+            "adventure" => Ok(Self::Adventure),
+            "fantasy" => Ok(Self::Fantasy),
+            "fiction" => Ok(Self::Fiction),
+            "science" => Ok(Self::Science),
+            "drama" => Ok(Self::Drama),
+            other => Err(other.to_string())
+        }
+    }
+
     fn as_string(&self) -> &'static str {
         match self {
             Self::Adventure => "Adventure",
             Self::Fantasy => "Fantasy",
             Self::Fiction => "Fiction",
             Self::Science => "Science",
+            Self::Drama => "Drama"
         }
     }
 }
@@ -20,7 +33,7 @@ pub struct Book {
     title: String,
     author: String,
     category: Category,
-    pub owner: String,
+    pub owner: Option<String>,
 }
 
 impl Book {
@@ -29,13 +42,15 @@ impl Book {
             title,
             author,
             category,
-            owner: String::from("None"),
+            owner: None,
         }
     }
 
     pub fn find_book_i_by_title(books: &[Book], title: &str) -> Option<usize> {
+        let title = title.to_lowercase();
+        
         for (index, book) in books.iter().enumerate() {
-            if book.title == title {
+            if book.title.to_lowercase() == title {
                 return Some(index);
             }
         }
@@ -47,6 +62,6 @@ impl Book {
         print!("{:width$} | ", self.title, width = longest_title);
         print!("{:width$} | ", self.author, width = longest_author);
         print!("{:width$} | ", self.category.as_string(), width = longest_category);
-        println!("{:width$}", self.owner, width = longest_owner);
+        println!("{:width$}", self.owner.as_ref().unwrap_or(&"None".to_string()), width = longest_owner);
     }
 }
