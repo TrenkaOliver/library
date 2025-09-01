@@ -28,11 +28,9 @@ fn main() {
         match choice {
             "1" => {
                 library.borrow_book();
-                library.update_longest_owner();
             },
             "2" => {
                 library.return_book();
-                library.update_longest_owner();
             },
             "3" => library.add_book(),
             "4" => library.inspect_books(),

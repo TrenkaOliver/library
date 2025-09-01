@@ -36,6 +36,12 @@ impl Library {
         name.trim().to_string()
     }
 
+    fn update_longest(longest: &mut usize, new_value: &str) {
+        if *longest < new_value.len() {
+            *longest = new_value.len();
+        }
+    }
+
     fn log_in(&mut self) -> bool {
         let name = Self::get_user_input("\nEnter your name!");
 
@@ -86,7 +92,7 @@ impl Library {
                 if self.books[index].owner.is_none() {
                     println!("You borrowed {title} succesfully!\n");
                     self.books[index].owner = Some(self.users[self.current_user].name.clone());
-                    self.update_longest_owner();
+                    Self::update_longest(&mut self.longest_owner, &self.users[self.current_user].name);
                 } else {
                     println!("This book is currenty borrowed by {}\n", self.books[index].owner.as_ref().unwrap());
                 }
@@ -121,21 +127,10 @@ impl Library {
             Err(r) => {println!("There's no category named: {r}\n"); return;}
         };
 
-        if self.longest_title < title.len() {
-            self.longest_title = title.len();
-        }
-
-        if self.longest_author < author.len() {
-            self.longest_author = author.len();
-        }
+        Self::update_longest(&mut self.longest_title, &title);
+        Self::update_longest(&mut self.longest_author, &author);
 
         self.books.push(Book::new(title, author, category));
-    }
-
-    pub fn update_longest_owner(&mut self) {
-        if self.longest_owner < self.users[self.current_user].name.len() {
-            self.longest_owner = self.users[self.current_user].name.len();
-        }
     }
 
     pub fn inspect_books(&self) {
