@@ -7,14 +7,14 @@ pub enum Category {
 }
 
 impl Category {
-    pub fn from_string(category: &str) -> Result<Self, String> {
+    pub fn from_string(category: &str) -> Result<Self, &str> {
         match category.to_lowercase().as_str() {
             "adventure" => Ok(Self::Adventure),
             "fantasy" => Ok(Self::Fantasy),
             "fiction" => Ok(Self::Fiction),
             "science" => Ok(Self::Science),
             "drama" => Ok(Self::Drama),
-            other => Err(other.to_string())
+            _ => Err(category)
         }
     }
 
